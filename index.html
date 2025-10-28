@@ -3,72 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cardano Policy Tracker</title>
-    <!-- Version 2.0 - With Pagination & Full Metadata - Updated: 2025-10-28 -->
+    <title>Cardano Policy Tracker - Improved</title>
+    <!-- Version 3.0 - Wallet-based approach with full metadata -->
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
         }
-
+        
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             background: white;
             border-radius: 16px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             overflow: hidden;
         }
-
+        
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 30px;
             text-align: center;
         }
-
-        .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }
-
-        .header p {
-            font-size: 1.1em;
-            opacity: 0.95;
-        }
-
-        .content {
-            padding: 30px;
-        }
-
+        
+        .header h1 { font-size: 2.5em; margin-bottom: 10px; }
+        .header p { font-size: 1.1em; opacity: 0.95; }
+        
+        .content { padding: 30px; }
+        
         .input-section {
             background: #f8f9fa;
             padding: 25px;
             border-radius: 12px;
             margin-bottom: 30px;
         }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
+        
+        .form-group { margin-bottom: 20px; }
+        
         label {
             display: block;
             font-weight: 600;
             margin-bottom: 8px;
             color: #333;
         }
-
-        input[type="text"],
-        textarea {
+        
+        input[type="text"], textarea {
             width: 100%;
             padding: 12px;
             border: 2px solid #e0e0e0;
@@ -76,25 +60,24 @@
             font-size: 14px;
             transition: border-color 0.3s;
         }
-
-        input[type="text"]:focus,
-        textarea:focus {
+        
+        input[type="text"]:focus, textarea:focus {
             outline: none;
             border-color: #667eea;
         }
-
+        
         textarea {
             resize: vertical;
             font-family: monospace;
-            min-height: 100px;
+            min-height: 120px;
         }
-
+        
         .hint {
             font-size: 12px;
             color: #666;
             margin-top: 5px;
         }
-
+        
         button {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -106,24 +89,31 @@
             cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s;
         }
-
+        
         button:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
         }
-
+        
         button:disabled {
             background: #ccc;
             cursor: not-allowed;
             transform: none;
         }
-
+        
+        .export-btn {
+            background: #28a745;
+            margin-left: 10px;
+        }
+        
+        .export-btn:hover { background: #218838; }
+        
         .loading {
             text-align: center;
             padding: 40px;
             display: none;
         }
-
+        
         .spinner {
             border: 4px solid #f3f3f3;
             border-top: 4px solid #667eea;
@@ -133,23 +123,21 @@
             animation: spin 1s linear infinite;
             margin: 0 auto 20px;
         }
-
+        
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-
-        .results {
-            display: none;
-        }
-
+        
+        .results { display: none; }
+        
         .stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
             margin-bottom: 30px;
         }
-
+        
         .stat-card {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -157,30 +145,31 @@
             border-radius: 12px;
             text-align: center;
         }
-
+        
         .stat-card .number {
             font-size: 2.5em;
             font-weight: bold;
             margin-bottom: 5px;
         }
-
+        
         .stat-card .label {
             font-size: 0.9em;
             opacity: 0.9;
         }
-
+        
         .table-container {
             overflow-x: auto;
             background: white;
             border-radius: 12px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            max-height: 600px;
         }
-
+        
         table {
             width: 100%;
             border-collapse: collapse;
         }
-
+        
         th {
             background: #f8f9fa;
             padding: 15px;
@@ -190,38 +179,17 @@
             border-bottom: 2px solid #e0e0e0;
             position: sticky;
             top: 0;
+            z-index: 10;
         }
-
+        
         td {
             padding: 12px 15px;
             border-bottom: 1px solid #f0f0f0;
-        }
-
-        tr:hover {
-            background: #f8f9fa;
-        }
-
-        .wallet-address {
-            font-family: monospace;
             font-size: 13px;
-            color: #667eea;
-            word-break: break-all;
         }
-
-        .export-section {
-            margin-top: 20px;
-            text-align: right;
-        }
-
-        .export-btn {
-            background: #28a745;
-            padding: 10px 24px;
-        }
-
-        .export-btn:hover {
-            background: #218838;
-        }
-
+        
+        tr:hover { background: #f8f9fa; }
+        
         .error {
             background: #f8d7da;
             color: #721c24;
@@ -230,22 +198,17 @@
             margin-bottom: 20px;
             display: none;
         }
-
-        .footer {
-            text-align: center;
-            padding: 20px;
-            color: #666;
-            font-size: 14px;
-        }
-
-        .asset-badge {
-            display: inline-block;
-            background: #e3f2fd;
-            color: #1976d2;
-            padding: 4px 10px;
-            border-radius: 12px;
+        
+        .progress-log {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
             font-size: 12px;
-            font-weight: 600;
+            line-height: 1.6;
         }
     </style>
 </head>
@@ -253,7 +216,7 @@
     <div class="container">
         <div class="header">
             <h1>🔍 Cardano Policy Tracker</h1>
-            <p>Find all wallet addresses holding assets from your Policy IDs</p>
+            <p>Find wallet holders for specific Policy IDs</p>
         </div>
 
         <div class="content">
@@ -266,11 +229,18 @@
 
                 <div class="form-group">
                     <label for="policyIds">Policy IDs (one per line)</label>
-                    <textarea id="policyIds" placeholder="f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a&#10;a5bb0e5bb275a573d744a021f9b3bff73595468e002755b447e01559"></textarea>
-                    <div class="hint">Enter your Cardano Policy IDs, one per line</div>
+                    <textarea id="policyIds" placeholder="094c63f313c72569bfb63780c449350a161df227168ebf651f8f1ca9"></textarea>
+                    <div class="hint">Enter Cardano Policy IDs to scan for holders</div>
                 </div>
 
-                <button onclick="scanPolicies()" id="scanBtn">🚀 Scan Policies</button>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="fetchMetadata" checked>
+                        Fetch full metadata (slower but complete)
+                    </label>
+                </div>
+
+                <button onclick="scanPolicies()" id="scanBtn">🚀 Scan for Holders</button>
             </div>
 
             <div class="error" id="errorMsg"></div>
@@ -278,37 +248,22 @@
             <div class="loading" id="loading">
                 <div class="spinner"></div>
                 <p id="loadingText">Scanning policies...</p>
-                <div style="margin-top: 20px; max-height: 200px; overflow-y: auto; background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: left;">
-                    <div style="font-weight: bold; margin-bottom: 10px;">Progress Log:</div>
-                    <div id="progressLog" style="font-family: monospace; font-size: 12px; line-height: 1.6;"></div>
-                </div>
+                <div class="progress-log" id="progressLog"></div>
             </div>
 
             <div class="results" id="results">
                 <div class="stats" id="stats"></div>
 
-                <div class="export-section">
+                <div style="margin-bottom: 15px;">
                     <button class="export-btn" onclick="exportToCSV()">📥 Export to CSV</button>
                 </div>
 
                 <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Wallet Address</th>
-                                <th>Assets Held</th>
-                                <th>Policy ID</th>
-                                <th>Asset Names</th>
-                                <th>Metadata</th>
-                            </tr>
-                        </thead>
-                        <tbody id="resultsTable"></tbody>
+                    <table id="resultsTable">
+                        <thead id="tableHead"></thead>
+                        <tbody id="tableBody"></tbody>
                     </table>
                 </div>
-            </div>
-
-            <div class="footer">
-                <p>Built for the Cardano community • No data is stored • All processing happens in your browser</p>
             </div>
         </div>
     </div>
@@ -326,11 +281,64 @@
             }
         }
 
+        function hexToAscii(hex) {
+            try {
+                if (!hex || typeof hex !== 'string' || !/^[0-9a-fA-F]+$/.test(hex)) {
+                    return hex;
+                }
+                
+                let str = '';
+                for (let i = 0; i < hex.length; i += 2) {
+                    if (i + 2 <= hex.length) {
+                        const charCode = parseInt(hex.substr(i, 2), 16);
+                        if (charCode >= 32 && charCode <= 126) {
+                            str += String.fromCharCode(charCode);
+                        }
+                    }
+                }
+                
+                return str.length > 0 ? str : hex;
+            } catch (e) {
+                return hex;
+            }
+        }
+
+        function extractAllTraits(metadata) {
+            const traits = {};
+            
+            function processObject(obj, prefix = '') {
+                for (const [key, value] of Object.entries(obj)) {
+                    const fullKey = prefix ? `${prefix}.${key}` : key;
+                    
+                    if (typeof value !== 'object' || value === null) {
+                        if (typeof value === 'string' && /^[0-9a-fA-F]+$/.test(value) && value.length % 2 === 0) {
+                            traits[fullKey] = hexToAscii(value);
+                        } else {
+                            traits[fullKey] = value;
+                        }
+                    } else if (Array.isArray(value)) {
+                        traits[fullKey] = value.join(', ');
+                    } else {
+                        processObject(value, fullKey);
+                    }
+                }
+            }
+            
+            if (metadata.onchain_metadata) {
+                processObject(metadata.onchain_metadata);
+            }
+            if (metadata.metadata) {
+                processObject(metadata.metadata);
+            }
+            
+            return traits;
+        }
+
         async function scanPolicies() {
             const apiKey = document.getElementById('apiKey').value.trim();
             const policyIds = document.getElementById('policyIds').value.trim().split('\n').filter(id => id.trim());
+            const fetchMetadata = document.getElementById('fetchMetadata').checked;
 
-            // Validation
             if (!apiKey) {
                 showError('Please enter your Blockfrost API key');
                 return;
@@ -341,129 +349,103 @@
                 return;
             }
 
-            // Hide error, show loading
             hideError();
             document.getElementById('results').style.display = 'none';
             document.getElementById('loading').style.display = 'block';
             document.getElementById('scanBtn').disabled = true;
-            document.getElementById('progressLog').innerHTML = ''; // Clear previous logs
+            document.getElementById('progressLog').innerHTML = '';
 
             allData = [];
-            let totalAssets = 0;
-            let totalHolders = 0;
 
             try {
                 for (let i = 0; i < policyIds.length; i++) {
                     const policyId = policyIds[i].trim();
-                    document.getElementById('loadingText').textContent = 
-                        `Scanning policy ${i + 1}/${policyIds.length}: ${policyId.substring(0, 16)}...`;
+                    logProgress(`Policy ${i + 1}/${policyIds.length}: ${policyId.substring(0, 20)}...`);
 
                     // Get all assets for this policy (with pagination)
-                    const assets = await fetchPolicyAssets(apiKey, policyId);
-                    totalAssets += assets.length;
+                    const assets = await fetchAllPolicyAssets(apiKey, policyId);
+                    logProgress(`✓ Found ${assets.length} assets`);
 
-                    document.getElementById('loadingText').textContent = 
-                        `Policy ${i + 1}/${policyIds.length}: Found ${assets.length} assets. Fetching holders...`;
-
-                    // For each asset, get full metadata and holders
+                    // For each asset, get holders
                     for (let j = 0; j < assets.length; j++) {
-                        const asset = assets[j];
-                        const assetUnit = asset.asset || asset.unit;
-                        
-                        // Update progress
-                        if (j % 10 === 0 || j === assets.length - 1) {
-                            document.getElementById('loadingText').textContent = 
-                                `Policy ${i + 1}/${policyIds.length}: Processing asset ${j + 1}/${assets.length}...`;
+                        if (j % 50 === 0) {
+                            logProgress(`Processing asset ${j + 1}/${assets.length}...`);
                         }
 
-                        await sleep(350); // Rate limiting
-
-                        // Get full asset metadata
-                        const metadata = await fetchAssetMetadata(apiKey, assetUnit);
+                        const assetUnit = assets[j].asset || assets[j].unit;
                         
-                        let assetName = 'Unknown';
-                        let onchainMetadata = {};
-                        
-                        if (metadata) {
-                            // Try to get readable name from various sources
-                            assetName = metadata.asset_name || metadata.onchain_metadata?.name || assetUnit.substring(56);
-                            assetName = decodeAssetName(assetName);
-                            onchainMetadata = metadata.onchain_metadata || {};
-                        }
-
                         // Get holders
                         const holders = await fetchAssetHolders(apiKey, assetUnit);
                         
-                        if (holders) {
+                        // Get metadata if requested
+                        let metadata = {};
+                        let assetName = assetUnit.substring(56);
+                        let traits = {};
+                        
+                        if (fetchMetadata) {
+                            metadata = await fetchAssetMetadata(apiKey, assetUnit);
+                            if (metadata) {
+                                assetName = metadata.asset_name || metadata.onchain_metadata?.name || assetName;
+                                assetName = hexToAscii(assetName);
+                                traits = extractAllTraits(metadata);
+                            }
+                        }
+
+                        if (holders && holders.length > 0) {
                             for (const holder of holders) {
-                                totalHolders++;
                                 allData.push({
                                     policyId: policyId,
                                     assetUnit: assetUnit,
                                     assetName: assetName,
                                     walletAddress: holder.address,
                                     quantity: holder.quantity,
-                                    metadata: onchainMetadata
+                                    traits: traits
                                 });
                             }
                         }
 
-                        await sleep(350); // Rate limiting
+                        await sleep(350);
                     }
                 }
 
-                // Display results
-                displayResults(policyIds.length, totalAssets, totalHolders);
+                logProgress(`✅ Complete! Found ${allData.length} total holdings`);
+                displayResults();
 
             } catch (error) {
                 showError(`Error: ${error.message}`);
+                logProgress(`❌ Error: ${error.message}`);
             } finally {
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('scanBtn').disabled = false;
             }
         }
 
-        async function fetchPolicyAssets(apiKey, policyId) {
+        async function fetchAllPolicyAssets(apiKey, policyId) {
             let allAssets = [];
             let page = 1;
             const perPage = 100;
 
-            logProgress(`Starting to fetch assets for policy: ${policyId.substring(0, 20)}...`);
-
             while (true) {
-                logProgress(`Fetching page ${page} (expect up to ${perPage} assets)...`);
-                
                 const response = await fetch(`https://cardano-mainnet.blockfrost.io/api/v0/assets/policy/${policyId}?page=${page}&count=${perPage}`, {
                     headers: { 'project_id': apiKey }
                 });
 
                 if (!response.ok) {
-                    logProgress(`❌ API Error on page ${page}: ${response.status} ${response.statusText}`);
-                    throw new Error(`Failed to fetch policy assets: ${response.statusText}`);
+                    throw new Error(`API Error: ${response.statusText}`);
                 }
 
                 const assets = await response.json();
-                logProgress(`✓ Page ${page}: Received ${assets.length} assets`);
                 
-                if (!assets || assets.length === 0) {
-                    logProgress('No more assets found, stopping pagination');
-                    break; // No more results
-                }
+                if (!assets || assets.length === 0) break;
 
                 allAssets = allAssets.concat(assets);
-                logProgress(`📊 Total assets collected so far: ${allAssets.length}`);
                 
-                // If we got less than perPage, we're done
-                if (assets.length < perPage) {
-                    logProgress(`Last page detected (${assets.length} < ${perPage})`);
-                    break;
-                }
+                if (assets.length < perPage) break;
 
                 page++;
-                await sleep(350); // Rate limiting between pages
+                await sleep(350);
             }
 
-            logProgress(`✅ Finished! Total assets fetched: ${allAssets.length}`);
             return allAssets;
         }
 
@@ -472,11 +454,7 @@
                 headers: { 'project_id': apiKey }
             });
 
-            if (!response.ok) {
-                console.error(`Failed to fetch holders for ${assetUnit}`);
-                return [];
-            }
-
+            if (!response.ok) return [];
             return await response.json();
         }
 
@@ -485,123 +463,125 @@
                 headers: { 'project_id': apiKey }
             });
 
-            if (!response.ok) {
-                return null;
-            }
-
+            if (!response.ok) return null;
             return await response.json();
         }
 
-        function hexToString(hex) {
-            if (!hex) return '';
-            try {
-                let str = '';
-                for (let i = 0; i < hex.length; i += 2) {
-                    const charCode = parseInt(hex.substr(i, 2), 16);
-                    if (charCode >= 32 && charCode <= 126) { // Printable ASCII
-                        str += String.fromCharCode(charCode);
-                    }
-                }
-                return str || hex; // Return hex if no readable string
-            } catch (e) {
-                return hex;
+        function displayResults() {
+            if (allData.length === 0) {
+                showError('No holders found');
+                return;
             }
-        }
 
-        function decodeAssetName(assetName) {
-            if (!assetName) return 'Unknown';
-            
-            // If it looks like hex (even length, only hex chars), try to decode
-            if (assetName.length % 2 === 0 && /^[0-9a-fA-F]+$/.test(assetName)) {
-                const decoded = hexToString(assetName);
-                return decoded || assetName;
-            }
-            
-            return assetName;
-        }
-
-        function displayResults(policyCount, assetCount, holderCount) {
-            // Calculate unique holders
-            const uniqueHolders = new Set(allData.map(d => d.walletAddress)).size;
+            // Get unique wallets and assets
+            const uniqueWallets = new Set(allData.map(d => d.walletAddress)).size;
+            const uniqueAssets = new Set(allData.map(d => d.assetUnit)).size;
+            const uniquePolicies = new Set(allData.map(d => d.policyId)).size;
 
             // Display stats
-            const statsHTML = `
+            document.getElementById('stats').innerHTML = `
                 <div class="stat-card">
-                    <div class="number">${policyCount}</div>
-                    <div class="label">Policies Scanned</div>
+                    <div class="number">${uniquePolicies}</div>
+                    <div class="label">Policies</div>
                 </div>
                 <div class="stat-card">
-                    <div class="number">${assetCount}</div>
-                    <div class="label">Assets Found</div>
+                    <div class="number">${uniqueAssets}</div>
+                    <div class="label">Assets</div>
                 </div>
                 <div class="stat-card">
-                    <div class="number">${uniqueHolders}</div>
+                    <div class="number">${uniqueWallets}</div>
                     <div class="label">Unique Holders</div>
                 </div>
                 <div class="stat-card">
-                    <div class="number">${holderCount}</div>
+                    <div class="number">${allData.length}</div>
                     <div class="label">Total Holdings</div>
                 </div>
             `;
-            document.getElementById('stats').innerHTML = statsHTML;
 
-            // Group by wallet
-            const walletMap = {};
+            // Get all unique trait keys
+            const allTraitKeys = new Set();
             allData.forEach(item => {
-                if (!walletMap[item.walletAddress]) {
-                    walletMap[item.walletAddress] = {
-                        address: item.walletAddress,
-                        policyIds: new Set(),
-                        assets: [],
-                        metadata: []
-                    };
+                if (item.traits) {
+                    Object.keys(item.traits).forEach(key => {
+                        if (!['image', 'files', 'mediaType'].includes(key)) {
+                            allTraitKeys.add(key);
+                        }
+                    });
                 }
-                walletMap[item.walletAddress].policyIds.add(item.policyId);
-                walletMap[item.walletAddress].assets.push(item.assetName);
-                walletMap[item.walletAddress].metadata.push(item.metadata);
             });
+            const traitKeys = Array.from(allTraitKeys).sort();
 
-            // Display table
-            let tableHTML = '';
-            Object.values(walletMap).forEach(wallet => {
-                const assetNames = wallet.assets.slice(0, 3).join(', ') + 
-                    (wallet.assets.length > 3 ? ` +${wallet.assets.length - 3} more` : '');
-                
-                // Format metadata preview
-                const metadataPreview = wallet.metadata.length > 0 && wallet.metadata[0] && Object.keys(wallet.metadata[0]).length > 0
-                    ? JSON.stringify(wallet.metadata[0]).substring(0, 50) + '...'
-                    : 'None';
-                
-                tableHTML += `
+            // Build table
+            let headerHTML = '<tr><th>Wallet</th><th>Asset Name</th><th>Policy ID</th><th>Quantity</th>';
+            traitKeys.forEach(key => {
+                headerHTML += `<th>${key}</th>`;
+            });
+            headerHTML += '</tr>';
+
+            let bodyHTML = '';
+            allData.forEach(item => {
+                bodyHTML += `
                     <tr>
-                        <td><span class="wallet-address">${wallet.address}</span></td>
-                        <td><span class="asset-badge">${wallet.assets.length}</span></td>
-                        <td style="font-family: monospace; font-size: 12px;">${Array.from(wallet.policyIds)[0].substring(0, 16)}...</td>
-                        <td style="font-size: 13px;">${assetNames}</td>
-                        <td style="font-size: 11px; color: #666;">${metadataPreview}</td>
-                    </tr>
+                        <td title="${item.walletAddress}">${truncate(item.walletAddress, 16)}</td>
+                        <td>${item.assetName}</td>
+                        <td title="${item.policyId}">${truncate(item.policyId, 12)}</td>
+                        <td>${item.quantity}</td>
                 `;
+                
+                traitKeys.forEach(key => {
+                    const value = item.traits && item.traits[key] ? item.traits[key] : '';
+                    bodyHTML += `<td>${value}</td>`;
+                });
+                
+                bodyHTML += '</tr>';
             });
 
-            document.getElementById('resultsTable').innerHTML = tableHTML;
+            document.getElementById('tableHead').innerHTML = headerHTML;
+            document.getElementById('tableBody').innerHTML = bodyHTML;
             document.getElementById('results').style.display = 'block';
         }
 
         function exportToCSV() {
-            let csv = 'Wallet Address,Policy ID,Asset Unit,Asset Name,Quantity,Metadata\n';
+            // Get all unique trait keys
+            const allTraitKeys = new Set();
+            allData.forEach(item => {
+                if (item.traits) {
+                    Object.keys(item.traits).forEach(key => allTraitKeys.add(key));
+                }
+            });
+            const traitKeys = Array.from(allTraitKeys).sort();
+
+            let csv = 'Wallet Address,Asset Name,Policy ID,Asset Unit,Quantity,' + traitKeys.join(',') + '\n';
             
             allData.forEach(row => {
-                const metadataStr = JSON.stringify(row.metadata).replace(/"/g, '""'); // Escape quotes
-                csv += `"${row.walletAddress}","${row.policyId}","${row.assetUnit}","${row.assetName}","${row.quantity}","${metadataStr}"\n`;
+                const line = [
+                    row.walletAddress,
+                    row.assetName,
+                    row.policyId,
+                    row.assetUnit,
+                    row.quantity
+                ];
+                
+                traitKeys.forEach(key => {
+                    line.push(row.traits && row.traits[key] ? row.traits[key] : '');
+                });
+                
+                csv += line.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',') + '\n';
             });
 
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `cardano-policy-holders-${Date.now()}.csv`;
+            a.download = `cardano-holders-${Date.now()}.csv`;
             a.click();
             window.URL.revokeObjectURL(url);
+        }
+
+        function truncate(str, maxLength) {
+            if (!str || str.length <= maxLength) return str;
+            const half = Math.floor((maxLength - 3) / 2);
+            return str.substring(0, half) + '...' + str.substring(str.length - half);
         }
 
         function showError(message) {
