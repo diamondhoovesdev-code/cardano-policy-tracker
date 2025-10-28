@@ -294,6 +294,7 @@
                                 <th>Assets Held</th>
                                 <th>Policy ID</th>
                                 <th>Asset Names</th>
+                                <th>Metadata</th>
                             </tr>
                         </thead>
                         <tbody id="resultsTable"></tbody>
@@ -341,27 +342,57 @@
                     document.getElementById('loadingText').textContent = 
                         `Scanning policy ${i + 1}/${policyIds.length}: ${policyId.substring(0, 16)}...`;
 
-                    // Get all assets for this policy
+                    // Get all assets for this policy (with pagination)
                     const assets = await fetchPolicyAssets(apiKey, policyId);
                     totalAssets += assets.length;
 
-                    // For each asset, get holders
-                    for (const asset of assets) {
+                    document.getElementById('loadingText').textContent = 
+                        `Policy ${i + 1}/${policyIds.length}: Found ${assets.length} assets. Fetching holders...`;
+
+                    // For each asset, get full metadata and holders
+                    for (let j = 0; j < assets.length; j++) {
+                        const asset = assets[j];
+                        const assetUnit = asset.asset || asset.unit;
+                        
+                        // Update progress
+                        if (j % 10 === 0 || j === assets.length - 1) {
+                            document.getElementById('loadingText').textContent = 
+                                `Policy ${i + 1}/${policyIds.length}: Processing asset ${j + 1}/${assets.length}...`;
+                        }
+
                         await sleep(350); // Rate limiting
-                        const holders = await fetchAssetHolders(apiKey, asset.asset || asset.unit);
+
+                        // Get full asset metadata
+                        const metadata = await fetchAssetMetadata(apiKey, assetUnit);
+                        
+                        let assetName = 'Unknown';
+                        let onchainMetadata = {};
+                        
+                        if (metadata) {
+                            // Try to get readable name from various sources
+                            assetName = metadata.asset_name || metadata.onchain_metadata?.name || assetUnit.substring(56);
+                            assetName = decodeAssetName(assetName);
+                            onchainMetadata = metadata.onchain_metadata || {};
+                        }
+
+                        // Get holders
+                        const holders = await fetchAssetHolders(apiKey, assetUnit);
                         
                         if (holders) {
                             for (const holder of holders) {
                                 totalHolders++;
                                 allData.push({
                                     policyId: policyId,
-                                    assetUnit: asset.asset || asset.unit,
-                                    assetName: asset.asset_name || 'Unknown',
+                                    assetUnit: assetUnit,
+                                    assetName: assetName,
                                     walletAddress: holder.address,
-                                    quantity: holder.quantity
+                                    quantity: holder.quantity,
+                                    metadata: onchainMetadata
                                 });
                             }
                         }
+
+                        await sleep(350); // Rate limiting
                     }
                 }
 
@@ -377,15 +408,37 @@
         }
 
         async function fetchPolicyAssets(apiKey, policyId) {
-            const response = await fetch(`https://cardano-mainnet.blockfrost.io/api/v0/assets/policy/${policyId}`, {
-                headers: { 'project_id': apiKey }
-            });
+            let allAssets = [];
+            let page = 1;
+            const perPage = 100;
 
-            if (!response.ok) {
-                throw new Error(`Failed to fetch policy assets: ${response.statusText}`);
+            while (true) {
+                const response = await fetch(`https://cardano-mainnet.blockfrost.io/api/v0/assets/policy/${policyId}?page=${page}&count=${perPage}`, {
+                    headers: { 'project_id': apiKey }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch policy assets: ${response.statusText}`);
+                }
+
+                const assets = await response.json();
+                
+                if (!assets || assets.length === 0) {
+                    break; // No more results
+                }
+
+                allAssets = allAssets.concat(assets);
+                
+                // If we got less than perPage, we're done
+                if (assets.length < perPage) {
+                    break;
+                }
+
+                page++;
+                await sleep(350); // Rate limiting between pages
             }
 
-            return await response.json();
+            return allAssets;
         }
 
         async function fetchAssetHolders(apiKey, assetUnit) {
@@ -399,6 +452,46 @@
             }
 
             return await response.json();
+        }
+
+        async function fetchAssetMetadata(apiKey, assetUnit) {
+            const response = await fetch(`https://cardano-mainnet.blockfrost.io/api/v0/assets/${assetUnit}`, {
+                headers: { 'project_id': apiKey }
+            });
+
+            if (!response.ok) {
+                return null;
+            }
+
+            return await response.json();
+        }
+
+        function hexToString(hex) {
+            if (!hex) return '';
+            try {
+                let str = '';
+                for (let i = 0; i < hex.length; i += 2) {
+                    const charCode = parseInt(hex.substr(i, 2), 16);
+                    if (charCode >= 32 && charCode <= 126) { // Printable ASCII
+                        str += String.fromCharCode(charCode);
+                    }
+                }
+                return str || hex; // Return hex if no readable string
+            } catch (e) {
+                return hex;
+            }
+        }
+
+        function decodeAssetName(assetName) {
+            if (!assetName) return 'Unknown';
+            
+            // If it looks like hex (even length, only hex chars), try to decode
+            if (assetName.length % 2 === 0 && /^[0-9a-fA-F]+$/.test(assetName)) {
+                const decoded = hexToString(assetName);
+                return decoded || assetName;
+            }
+            
+            return assetName;
         }
 
         function displayResults(policyCount, assetCount, holderCount) {
@@ -433,11 +526,13 @@
                     walletMap[item.walletAddress] = {
                         address: item.walletAddress,
                         policyIds: new Set(),
-                        assets: []
+                        assets: [],
+                        metadata: []
                     };
                 }
                 walletMap[item.walletAddress].policyIds.add(item.policyId);
                 walletMap[item.walletAddress].assets.push(item.assetName);
+                walletMap[item.walletAddress].metadata.push(item.metadata);
             });
 
             // Display table
@@ -446,12 +541,18 @@
                 const assetNames = wallet.assets.slice(0, 3).join(', ') + 
                     (wallet.assets.length > 3 ? ` +${wallet.assets.length - 3} more` : '');
                 
+                // Format metadata preview
+                const metadataPreview = wallet.metadata.length > 0 && wallet.metadata[0] && Object.keys(wallet.metadata[0]).length > 0
+                    ? JSON.stringify(wallet.metadata[0]).substring(0, 50) + '...'
+                    : 'None';
+                
                 tableHTML += `
                     <tr>
                         <td><span class="wallet-address">${wallet.address}</span></td>
                         <td><span class="asset-badge">${wallet.assets.length}</span></td>
                         <td style="font-family: monospace; font-size: 12px;">${Array.from(wallet.policyIds)[0].substring(0, 16)}...</td>
                         <td style="font-size: 13px;">${assetNames}</td>
+                        <td style="font-size: 11px; color: #666;">${metadataPreview}</td>
                     </tr>
                 `;
             });
@@ -461,10 +562,11 @@
         }
 
         function exportToCSV() {
-            let csv = 'Wallet Address,Policy ID,Asset Unit,Asset Name,Quantity\n';
+            let csv = 'Wallet Address,Policy ID,Asset Unit,Asset Name,Quantity,Metadata\n';
             
             allData.forEach(row => {
-                csv += `"${row.walletAddress}","${row.policyId}","${row.assetUnit}","${row.assetName}","${row.quantity}"\n`;
+                const metadataStr = JSON.stringify(row.metadata).replace(/"/g, '""'); // Escape quotes
+                csv += `"${row.walletAddress}","${row.policyId}","${row.assetUnit}","${row.assetName}","${row.quantity}","${metadataStr}"\n`;
             });
 
             const blob = new Blob([csv], { type: 'text/csv' });
