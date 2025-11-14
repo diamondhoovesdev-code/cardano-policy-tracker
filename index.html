@@ -1,601 +1,543 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cardano Policy Tracker - Improved</title>
-    <!-- Version 3.0 - Wallet-based approach with full metadata -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>DIAMOND HOOVES - Home</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+        * { margin:0; padding:0; box-sizing:border-box; }
+        html,body { width:100%; height:100%; overflow-x:hidden; }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-        
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            overflow: hidden;
-        }
-        
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-image: url('Astro landing page.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
             color: white;
-            padding: 30px;
-            text-align: center;
         }
-        
-        .header h1 { font-size: 2.5em; margin-bottom: 10px; }
-        .header p { font-size: 1.1em; opacity: 0.95; }
-        
-        .content { padding: 30px; }
-        
-        .input-section {
-            background: #f8f9fa;
-            padding: 25px;
-            border-radius: 12px;
-            margin-bottom: 30px;
-        }
-        
-        .form-group { margin-bottom: 20px; }
-        
-        label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #333;
-        }
-        
-        input[type="text"], textarea {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: border-color 0.3s;
-        }
-        
-        input[type="text"]:focus, textarea:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        
-        textarea {
-            resize: vertical;
-            font-family: monospace;
-            min-height: 120px;
-        }
-        
-        .hint {
-            font-size: 12px;
-            color: #666;
-            margin-top: 5px;
-        }
-        
-        button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 14px 32px;
-            font-size: 16px;
-            font-weight: 600;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
-        }
-        
-        button:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        .export-btn {
-            background: #28a745;
-            margin-left: 10px;
-        }
-        
-        .export-btn:hover { background: #218838; }
-        
-        .loading {
-            text-align: center;
-            padding: 40px;
-            display: none;
-        }
-        
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .results { display: none; }
-        
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        
-        .stat-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 12px;
-            text-align: center;
-        }
-        
-        .stat-card .number {
-            font-size: 2.5em;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        
-        .stat-card .label {
-            font-size: 0.9em;
-            opacity: 0.9;
-        }
-        
-        .table-container {
-            overflow-x: auto;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            max-height: 600px;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        
-        th {
-            background: #f8f9fa;
-            padding: 15px;
-            text-align: left;
-            font-weight: 600;
-            color: #333;
-            border-bottom: 2px solid #e0e0e0;
-            position: sticky;
+
+        /* NAVIGATION */
+        .navbar {
+            position: fixed;
             top: 0;
-            z-index: 10;
+            left: 0;
+            width: 100%;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(8px);
+            border-bottom: 2px solid rgba(192,38,211,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            z-index: 9999;
         }
-        
-        td {
-            padding: 12px 15px;
-            border-bottom: 1px solid #f0f0f0;
+
+        .nav-logo {
+            height: 50px;
+            width: auto;
+        }
+
+        .nav-center {
+            display: flex;
+            gap: 28px;
+            justify-content: center;
+            flex-grow: 1;
+        }
+
+        .nav-center a {
+            color: #f8fafc;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color .2s ease;
+        }
+
+        .nav-center a:hover {
+            color: #c026d3;
+        }
+
+        .nav-socials {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .nav-socials a img {
+            width: 22px;
+            height: 22px;
+            filter: brightness(0) invert(1);
+            transition: transform .2s, filter .2s;
+        }
+
+        .nav-socials a:hover img {
+            transform: scale(1.1);
+            filter: invert(63%) sepia(76%) saturate(7445%) hue-rotate(275deg) brightness(99%) contrast(101%);
+        }
+
+        /* MOBILE MENU */
+        .mobile-menu-btn {
+            display: none;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            top: 76px;
+            left: 0;
+            width: 100%;
+            background: rgba(15, 23, 42, 0.98);
+            backdrop-filter: blur(8px);
+            border-bottom: 2px solid rgba(192,38,211,0.5);
+            z-index: 9998;
+            max-height: calc(100vh - 76px);
+            overflow-y: auto;
+        }
+
+        .mobile-menu.active {
+            display: block;
+        }
+
+        .mobile-menu a {
+            display: block;
+            color: #f8fafc;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 16px;
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(192,38,211,0.2);
+            transition: background .2s ease;
+        }
+
+        .mobile-menu a:hover {
+            background: rgba(192,38,211,0.1);
+            color: #c026d3;
+        }
+
+        /* TOP INFO BAR (Below Nav) */
+        .top-info-bar {
+            position: fixed;
+            top: 76px;
+            left: 0;
+            width: 100%;
+            background: transparent;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 20px;
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 12px;
+            z-index: 9999;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .music-controls {
+            background: transparent;
+            padding: 0;
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+        }
+
+        .music-controls button {
+            background: #c026d3;
+            border: none;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .music-controls input[type="range"] {
+            width: 80px;
+        }
+
+        /* HERO SECTION */
+        .hero {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
+            flex-direction: column;
+            padding: 160px 20px 100px;
+        }
+
+        .hero img {
+            width: 90%;
+            max-width: 600px;
+            height: auto;
+            margin-bottom: 40px;
+        }
+
+        .hero h1 {
+            font-size: clamp(1.5rem, 5vw, 2.2rem);
+            font-weight: 700;
+            color: #f1f5f9;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        /* PRICE TICKER */
+        .ticker-wrap {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(30,41,59,0.95);
+            padding: 10px 0;
+            overflow: hidden;
+            z-index: 9999;
+            border-top: 2px solid rgba(192,38,211,0.5);
+        }
+
+        .ticker {
+            display: flex;
+            animation: scroll 40s linear infinite;
+            white-space: nowrap;
+        }
+
+        .ticker-item {
+            display: inline-flex;
+            align-items: center;
+            margin: 0 30px;
+            color: #f1f5f9;
+            font-weight: 600;
             font-size: 13px;
         }
-        
-        tr:hover { background: #f8f9fa; }
-        
-        .error {
-            background: #f8d7da;
-            color: #721c24;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            display: none;
+
+        .ticker-symbol {
+            color: #c026d3;
+            margin-right: 6px;
         }
-        
-        .progress-log {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 15px;
-            max-height: 200px;
-            overflow-y: auto;
-            font-family: monospace;
-            font-size: 12px;
-            line-height: 1.6;
+
+        .ticker-price {
+            margin-right: 6px;
+        }
+
+        .ticker-change {
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+
+        .ticker-up {
+            background: rgba(34,197,94,0.2);
+            color: #4ade80;
+        }
+
+        .ticker-down {
+            background: rgba(239,68,68,0.2);
+            color: #f87171;
+        }
+
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* TABLET AND MOBILE STYLES */
+        @media (max-width: 1024px) {
+            .nav-center {
+                gap: 20px;
+            }
+            .nav-center a {
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 12px 15px;
+            }
+
+            .nav-logo {
+                height: 45px;
+            }
+
+            .nav-center {
+                display: none;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .top-info-bar {
+                top: 66px;
+                font-size: 11px;
+                padding: 6px 15px;
+                justify-content: center;
+            }
+
+            .last-updated {
+                font-size: 10px;
+            }
+
+            .music-controls button {
+                padding: 4px 8px;
+                font-size: 11px;
+            }
+
+            .music-controls input[type="range"] {
+                width: 60px;
+            }
+
+            .hero {
+                padding: 140px 15px 80px;
+            }
+
+            .ticker-item {
+                margin: 0 20px;
+                font-size: 12px;
+            }
+
+            .ticker-change {
+                font-size: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .nav-logo {
+                height: 40px;
+            }
+
+            .top-info-bar {
+                flex-direction: column;
+                gap: 8px;
+                padding: 8px 15px;
+            }
+
+            .nav-socials a img {
+                width: 20px;
+                height: 20px;
+            }
+
+            .ticker-item {
+                margin: 0 15px;
+                font-size: 11px;
+            }
+
+            .ticker-price {
+                display: flex;
+                flex-direction: column;
+                line-height: 1.3;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🔍 Cardano Policy Tracker</h1>
-            <p>Find wallet holders for specific Policy IDs</p>
+
+    <!-- NAVIGATION -->
+    <div class="navbar">
+        <img class="nav-logo" src="Diamond_Hooves_logo.png" alt="Diamond Hooves Logo">
+        
+        <button class="mobile-menu-btn" id="mobile-menu-btn">☰</button>
+
+        <div class="nav-center">
+            <a href="https://diamond-hooves.gitbook.io/diamond-hooves" target="_blank">Diamond Paper</a>
+            <a href="comingsoon.html">$DMND Paper</a>
+            <a href="comingsoon.html">Liquid NFT Swapper</a>
+            <a href="https://www.jpg.store/collection/diamondhooves" target="_blank">Jpg Store</a>
+            <a href="comingsoon.html">Astro Run 1.0</a>
+            <a href="https://hub.cnft.tools/staking/diamondhooves" target="_blank">Staking</a>
+            <a href="comingsoon.html">Race Testing</a>
+            <a href="https://mints.yepple.io/diamondhooves" target="_blank">Mint</a>
+            <a href="comingsoon.html">Roadmap</a>
         </div>
 
-        <div class="content">
-            <div class="input-section">
-                <div class="form-group">
-                    <label for="apiKey">Blockfrost API Key</label>
-                    <input type="text" id="apiKey" placeholder="Enter your Blockfrost API key">
-                    <div class="hint">Get a free API key at <a href="https://blockfrost.io" target="_blank">blockfrost.io</a></div>
-                </div>
-
-                <div class="form-group">
-                    <label for="policyIds">Policy IDs (one per line)</label>
-                    <textarea id="policyIds" placeholder="094c63f313c72569bfb63780c449350a161df227168ebf651f8f1ca9"></textarea>
-                    <div class="hint">Enter Cardano Policy IDs to scan for holders</div>
-                </div>
-
-                <div class="form-group">
-                    <label>
-                        <input type="checkbox" id="fetchMetadata" checked>
-                        Fetch full metadata (slower but complete)
-                    </label>
-                </div>
-
-                <button onclick="scanPolicies()" id="scanBtn">🚀 Scan for Holders</button>
-            </div>
-
-            <div class="error" id="errorMsg"></div>
-
-            <div class="loading" id="loading">
-                <div class="spinner"></div>
-                <p id="loadingText">Scanning policies...</p>
-                <div class="progress-log" id="progressLog"></div>
-            </div>
-
-            <div class="results" id="results">
-                <div class="stats" id="stats"></div>
-
-                <div style="margin-bottom: 15px;">
-                    <button class="export-btn" onclick="exportToCSV()">📥 Export to CSV</button>
-                </div>
-
-                <div class="table-container">
-                    <table id="resultsTable">
-                        <thead id="tableHead"></thead>
-                        <tbody id="tableBody"></tbody>
-                    </table>
-                </div>
-            </div>
+        <div class="nav-socials">
+            <a href="#" title="X / Twitter"><img src="https://cdn-icons-png.flaticon.com/512/5968/5968830.png" alt="X Icon"></a>
+            <a href="#" title="Discord"><img src="https://cdn-icons-png.flaticon.com/512/3670/3670157.png" alt="Discord Icon"></a>
+            <a href="#" title="Instagram"><img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" alt="Instagram Icon"></a>
         </div>
     </div>
 
+    <!-- MOBILE MENU -->
+    <div class="mobile-menu" id="mobile-menu">
+        <a href="https://diamond-hooves.gitbook.io/diamond-hooves" target="_blank">Diamond Paper</a>
+        <a href="comingsoon.html">$DMND Paper</a>
+        <a href="comingsoon.html">Liquid NFT Swapper</a>
+        <a href="https://www.jpg.store/collection/diamondhooves" target="_blank">Jpg Store</a>
+        <a href="comingsoon.html">Astro Run 1.0</a>
+        <a href="https://hub.cnft.tools/staking/diamondhooves" target="_blank">Staking</a>
+        <a href="comingsoon.html">Race Testing</a>
+        <a href="https://mints.yepple.io/diamondhooves" target="_blank">Mint</a>
+        <a href="comingsoon.html">Roadmap</a>
+    </div>
+
+    <!-- TOP INFO BAR BELOW NAV -->
+    <div class="top-info-bar">
+        <div class="last-updated" id="last-updated">Last updated: --:--:--</div>
+        <div class="music-controls">
+            <button id="play-pause">Play</button>
+            <input type="range" id="volume" min="0" max="1" step="0.01" value="0.4" />
+        </div>
+    </div>
+
+    <!-- HERO SECTION -->
+    <div class="hero">
+        <img src="Diamond_Hooves_logo.png" alt="Diamond Hooves Logo">
+        <h1>Eat. Sleep. Race. Repeat.</h1>
+    </div>
+
+    <!-- PRICE TICKER -->
+    <div class="ticker-wrap">
+        <div class="ticker" id="ticker">
+            <div class="ticker-item">Loading prices...</div>
+        </div>
+    </div>
+
+    <audio id="bg-music" loop>
+        <source src="YesNoMaybe - Bark Technology.mp3" type="audio/mpeg">
+    </audio>
+
     <script>
-        let allData = [];
-
-        function logProgress(message) {
-            console.log(message);
-            const logDiv = document.getElementById('progressLog');
-            if (logDiv) {
-                const time = new Date().toLocaleTimeString();
-                logDiv.innerHTML += `<div>[${time}] ${message}</div>`;
-                logDiv.scrollTop = logDiv.scrollHeight;
+        // Audio activation on first interaction
+        const music = document.getElementById('bg-music');
+        let audioStarted = false;
+        
+        function startAudio() {
+            if (!audioStarted) {
+                music.play().then(() => {
+                    audioStarted = true;
+                    document.getElementById('play-pause').textContent = 'Pause';
+                }).catch(err => {
+                    console.log('Audio play failed:', err);
+                });
             }
         }
+        
+        // Start audio on any user interaction
+        document.addEventListener('click', startAudio, { once: true });
+        document.addEventListener('touchstart', startAudio, { once: true });
+        document.addEventListener('keydown', startAudio, { once: true });
 
-        function hexToAscii(hex) {
+        /* MOBILE MENU TOGGLE */
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('active');
+            mobileMenuBtn.textContent = mobileMenu.classList.contains('active') ? '✕' : '☰';
+        });
+
+        // Close mobile menu when clicking a link
+        mobileMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.remove('active');
+                mobileMenuBtn.textContent = '☰';
+            });
+        });
+
+        /* PRICE DATA */
+        const tokens = [
+            { symbol: 'ADA', id: 'cardano' },
+            { symbol: 'SNEK', id: 'snek' },
+            { symbol: 'MIN', id: 'minswap' },
+            { symbol: 'WMT', id: 'world-mobile-token' },
+            { symbol: 'AGIX', id: 'singularitynet' },
+            { symbol: 'SUNDAE', id: 'sundaeswap' },
+            { symbol: 'COPI', id: 'cornucopias' },
+            { symbol: 'MILK', id: 'milk-alliance' },
+            { symbol: 'NMKR', id: 'newm' },
+            { symbol: 'HOSKY', id: 'hosky-token' },
+            { symbol: 'IAG', id: 'iagon' },
+            { symbol: 'VYFI', id: 'vyfinance' }
+        ];
+
+        async function fetchPrices() {
             try {
-                if (!hex || typeof hex !== 'string' || !/^[0-9a-fA-F]+$/.test(hex)) {
-                    return hex;
-                }
-                
-                let str = '';
-                for (let i = 0; i < hex.length; i += 2) {
-                    if (i + 2 <= hex.length) {
-                        const charCode = parseInt(hex.substr(i, 2), 16);
-                        if (charCode >= 32 && charCode <= 126) {
-                            str += String.fromCharCode(charCode);
-                        }
-                    }
-                }
-                
-                return str.length > 0 ? str : hex;
-            } catch (e) {
-                return hex;
-            }
-        }
-
-        function extractAllTraits(metadata) {
-            const traits = {};
-            
-            function processObject(obj, prefix = '') {
-                for (const [key, value] of Object.entries(obj)) {
-                    const fullKey = prefix ? `${prefix}.${key}` : key;
-                    
-                    if (typeof value !== 'object' || value === null) {
-                        if (typeof value === 'string' && /^[0-9a-fA-F]+$/.test(value) && value.length % 2 === 0) {
-                            traits[fullKey] = hexToAscii(value);
-                        } else {
-                            traits[fullKey] = value;
-                        }
-                    } else if (Array.isArray(value)) {
-                        traits[fullKey] = value.join(', ');
-                    } else {
-                        processObject(value, fullKey);
-                    }
-                }
-            }
-            
-            if (metadata.onchain_metadata) {
-                processObject(metadata.onchain_metadata);
-            }
-            if (metadata.metadata) {
-                processObject(metadata.metadata);
-            }
-            
-            return traits;
-        }
-
-        async function scanPolicies() {
-            const apiKey = document.getElementById('apiKey').value.trim();
-            const policyIds = document.getElementById('policyIds').value.trim().split('\n').filter(id => id.trim());
-            const fetchMetadata = document.getElementById('fetchMetadata').checked;
-
-            if (!apiKey) {
-                showError('Please enter your Blockfrost API key');
-                return;
-            }
-
-            if (policyIds.length === 0) {
-                showError('Please enter at least one Policy ID');
-                return;
-            }
-
-            hideError();
-            document.getElementById('results').style.display = 'none';
-            document.getElementById('loading').style.display = 'block';
-            document.getElementById('scanBtn').disabled = true;
-            document.getElementById('progressLog').innerHTML = '';
-
-            allData = [];
-
-            try {
-                for (let i = 0; i < policyIds.length; i++) {
-                    const policyId = policyIds[i].trim();
-                    logProgress(`Policy ${i + 1}/${policyIds.length}: ${policyId.substring(0, 20)}...`);
-
-                    // Get all assets for this policy (with pagination)
-                    const assets = await fetchAllPolicyAssets(apiKey, policyId);
-                    logProgress(`✓ Found ${assets.length} assets`);
-
-                    // For each asset, get holders
-                    for (let j = 0; j < assets.length; j++) {
-                        if (j % 50 === 0) {
-                            logProgress(`Processing asset ${j + 1}/${assets.length}...`);
-                        }
-
-                        const assetUnit = assets[j].asset || assets[j].unit;
-                        
-                        // Get holders
-                        const holders = await fetchAssetHolders(apiKey, assetUnit);
-                        
-                        // Get metadata if requested
-                        let metadata = {};
-                        let assetName = assetUnit.substring(56);
-                        let traits = {};
-                        
-                        if (fetchMetadata) {
-                            metadata = await fetchAssetMetadata(apiKey, assetUnit);
-                            if (metadata) {
-                                assetName = metadata.asset_name || metadata.onchain_metadata?.name || assetName;
-                                assetName = hexToAscii(assetName);
-                                traits = extractAllTraits(metadata);
-                            }
-                        }
-
-                        if (holders && holders.length > 0) {
-                            for (const holder of holders) {
-                                allData.push({
-                                    policyId: policyId,
-                                    assetUnit: assetUnit,
-                                    assetName: assetName,
-                                    walletAddress: holder.address,
-                                    quantity: holder.quantity,
-                                    traits: traits
-                                });
-                            }
-                        }
-
-                        await sleep(350);
-                    }
-                }
-
-                logProgress(`✅ Complete! Found ${allData.length} total holdings`);
-                displayResults();
-
+                const ids = tokens.map(t => t.id).join(',');
+                const response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_24hr_change=true`);
+                const data = await response.json();
+                const adaUsdPrice = data['cardano'] ? data['cardano'].usd : 1;
+                const prices = tokens.map(token => {
+                    const tokenData = data[token.id];
+                    if (tokenData) {
+                        const usdPrice = tokenData.usd;
+                        const adaPriceCalc = usdPrice / adaUsdPrice;
+                        return {
+                            symbol: token.symbol,
+                            priceUsd: `$${usdPrice.toFixed(usdPrice < 0.01 ? 6 : 4)}`,
+                            priceAda: `₳${adaPriceCalc.toFixed(adaPriceCalc < 0.01 ? 6 : 4)}`,
+                            change: tokenData.usd_24h_change ? tokenData.usd_24h_change.toFixed(2) : '0',
+                            isUp: tokenData.usd_24h_change > 0
+                        };
+                    } else return { symbol: token.symbol, priceUsd: 'N/A', priceAda: 'N/A', change: '0', isUp: true };
+                });
+                updateTicker(prices);
+                updateLastUpdated();
             } catch (error) {
-                showError(`Error: ${error.message}`);
-                logProgress(`❌ Error: ${error.message}`);
-            } finally {
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('scanBtn').disabled = false;
+                console.error('❌ Error fetching prices:', error);
             }
         }
 
-        async function fetchAllPolicyAssets(apiKey, policyId) {
-            let allAssets = [];
-            let page = 1;
-            const perPage = 100;
+        function updateTicker(prices) {
+            const ticker = document.getElementById('ticker');
+            const allData = [...prices, ...prices];
+            ticker.innerHTML = allData.map(item => `
+                <div class="ticker-item">
+                    <span class="ticker-symbol">$${item.symbol}</span>
+                    <span class="ticker-price">${item.priceUsd} / ${item.priceAda}</span>
+                    <span class="ticker-change ${item.isUp ? 'ticker-up' : 'ticker-down'}">
+                        ${item.isUp ? '+' : ''}${item.change}%
+                    </span>
+                </div>
+            `).join('');
+        }
 
-            while (true) {
-                const response = await fetch(`https://cardano-mainnet.blockfrost.io/api/v0/assets/policy/${policyId}?page=${page}&count=${perPage}`, {
-                    headers: { 'project_id': apiKey }
+        // Update "Last updated" time in green text
+        function updateLastUpdated() {
+            const now = new Date();
+            const formatted = now.toLocaleTimeString();
+            const el = document.getElementById('last-updated');
+            el.textContent = `Last updated: ${formatted}`;
+        }
+
+        fetchPrices();
+        setInterval(fetchPrices, 60000);
+
+        // Music controls
+        const playPauseBtn = document.getElementById('play-pause');
+        const volumeSlider = document.getElementById('volume');
+
+        // Initial volume
+        music.volume = volumeSlider.value;
+
+        // Play/Pause toggle
+        playPauseBtn.addEventListener('click', () => {
+            if (music.paused) {
+                music.play().then(() => {
+                    playPauseBtn.textContent = 'Pause';
+                }).catch(() => {
+                    console.log("Autoplay prevented. User interaction needed.");
                 });
-
-                if (!response.ok) {
-                    throw new Error(`API Error: ${response.statusText}`);
-                }
-
-                const assets = await response.json();
-                
-                if (!assets || assets.length === 0) break;
-
-                allAssets = allAssets.concat(assets);
-                
-                if (assets.length < perPage) break;
-
-                page++;
-                await sleep(350);
+            } else {
+                music.pause();
+                playPauseBtn.textContent = 'Play';
             }
+        });
 
-            return allAssets;
-        }
-
-        async function fetchAssetHolders(apiKey, assetUnit) {
-            const response = await fetch(`https://cardano-mainnet.blockfrost.io/api/v0/assets/${assetUnit}/addresses`, {
-                headers: { 'project_id': apiKey }
-            });
-
-            if (!response.ok) return [];
-            return await response.json();
-        }
-
-        async function fetchAssetMetadata(apiKey, assetUnit) {
-            const response = await fetch(`https://cardano-mainnet.blockfrost.io/api/v0/assets/${assetUnit}`, {
-                headers: { 'project_id': apiKey }
-            });
-
-            if (!response.ok) return null;
-            return await response.json();
-        }
-
-        function displayResults() {
-            if (allData.length === 0) {
-                showError('No holders found');
-                return;
-            }
-
-            // Get unique wallets and assets
-            const uniqueWallets = new Set(allData.map(d => d.walletAddress)).size;
-            const uniqueAssets = new Set(allData.map(d => d.assetUnit)).size;
-            const uniquePolicies = new Set(allData.map(d => d.policyId)).size;
-
-            // Display stats
-            document.getElementById('stats').innerHTML = `
-                <div class="stat-card">
-                    <div class="number">${uniquePolicies}</div>
-                    <div class="label">Policies</div>
-                </div>
-                <div class="stat-card">
-                    <div class="number">${uniqueAssets}</div>
-                    <div class="label">Assets</div>
-                </div>
-                <div class="stat-card">
-                    <div class="number">${uniqueWallets}</div>
-                    <div class="label">Unique Holders</div>
-                </div>
-                <div class="stat-card">
-                    <div class="number">${allData.length}</div>
-                    <div class="label">Total Holdings</div>
-                </div>
-            `;
-
-            // Get all unique trait keys
-            const allTraitKeys = new Set();
-            allData.forEach(item => {
-                if (item.traits) {
-                    Object.keys(item.traits).forEach(key => {
-                        if (!['image', 'files', 'mediaType'].includes(key)) {
-                            allTraitKeys.add(key);
-                        }
-                    });
-                }
-            });
-            const traitKeys = Array.from(allTraitKeys).sort();
-
-            // Build table
-            let headerHTML = '<tr><th>Wallet</th><th>Asset Name</th><th>Policy ID</th><th>Quantity</th>';
-            traitKeys.forEach(key => {
-                headerHTML += `<th>${key}</th>`;
-            });
-            headerHTML += '</tr>';
-
-            let bodyHTML = '';
-            allData.forEach(item => {
-                bodyHTML += `
-                    <tr>
-                        <td title="${item.walletAddress}">${truncate(item.walletAddress, 16)}</td>
-                        <td>${item.assetName}</td>
-                        <td title="${item.policyId}">${truncate(item.policyId, 12)}</td>
-                        <td>${item.quantity}</td>
-                `;
-                
-                traitKeys.forEach(key => {
-                    const value = item.traits && item.traits[key] ? item.traits[key] : '';
-                    bodyHTML += `<td>${value}</td>`;
-                });
-                
-                bodyHTML += '</tr>';
-            });
-
-            document.getElementById('tableHead').innerHTML = headerHTML;
-            document.getElementById('tableBody').innerHTML = bodyHTML;
-            document.getElementById('results').style.display = 'block';
-        }
-
-        function exportToCSV() {
-            // Get all unique trait keys
-            const allTraitKeys = new Set();
-            allData.forEach(item => {
-                if (item.traits) {
-                    Object.keys(item.traits).forEach(key => allTraitKeys.add(key));
-                }
-            });
-            const traitKeys = Array.from(allTraitKeys).sort();
-
-            let csv = 'Wallet Address,Asset Name,Policy ID,Asset Unit,Quantity,' + traitKeys.join(',') + '\n';
-            
-            allData.forEach(row => {
-                const line = [
-                    row.walletAddress,
-                    row.assetName,
-                    row.policyId,
-                    row.assetUnit,
-                    row.quantity
-                ];
-                
-                traitKeys.forEach(key => {
-                    line.push(row.traits && row.traits[key] ? row.traits[key] : '');
-                });
-                
-                csv += line.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',') + '\n';
-            });
-
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `cardano-holders-${Date.now()}.csv`;
-            a.click();
-            window.URL.revokeObjectURL(url);
-        }
-
-        function truncate(str, maxLength) {
-            if (!str || str.length <= maxLength) return str;
-            const half = Math.floor((maxLength - 3) / 2);
-            return str.substring(0, half) + '...' + str.substring(str.length - half);
-        }
-
-        function showError(message) {
-            document.getElementById('errorMsg').textContent = message;
-            document.getElementById('errorMsg').style.display = 'block';
-        }
-
-        function hideError() {
-            document.getElementById('errorMsg').style.display = 'none';
-        }
-
-        function sleep(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
-        }
+        // Volume change
+        volumeSlider.addEventListener('input', () => {
+            music.volume = volumeSlider.value;
+        });
     </script>
+
 </body>
 </html>
